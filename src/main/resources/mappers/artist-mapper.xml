@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 해당 파일에 모든 쿼리문을 작성 -->
+<mapper namespace="artistMapper">
+	
+	<!-- 홀 검색 -->
+	<resultMap type="kh.study.consupport.common.vo.HallVO" id="hall">
+		<id property="hallCode" column="HALL_CODE"/>
+		<result property="hallName" column="HALL_NAME"/>
+		<result property="hallSeatCnt" column="HALL_SEAT_CNT"/>
+		<result property="hallRentPrice" column="HALL_RENT_PRICE"/>
+		<result property="hallDetail" column="HALL_DETAIL"/>
+		<result property="userId" column="USER_ID"/>
+		
+		<collection property="hallDateList" resultMap="hallDate"/>
+		<collection property="hallImgList" resultMap="hallImg"/>
+		<collection property="hallSeat" resultMap="hallSeat"/>
+	</resultMap>
+	
+	<!-- 홀 날짜 -->
+	<resultMap type="kh.study.consupport.common.vo.HallDateVO" id="hallDate">
+		<id column="HALL_DATE_CODE" property="hallDateCode" />
+		<result column="HALL_RENT_DATE" property="hallRentDate" />
+		<result column="HALL_STATUS" property="hallStatus" />
+		<result column="HALL_CODE" property="hallCode" />
+	</resultMap>
+	
+	<!-- 홀 이미지 -->
+	<resultMap type="kh.study.consupport.common.vo.HallImgVO" id="hallImg">
+		<id column="HALL_IMG_CODE" property="hallImgCode" />
+		<result column="HALL_IMG_NAME_ORIGIN" property="hallImgNameOrigin" />
+		<result column="HALL_IMG_NAME_ATTACHED" property="hallImgNameAttached" />
+		<result column="HALL_IMG_IS_MAIN" property="hallImgIsMain" />
+		<result column="HALL_CODE" property="hallCode" />
+	</resultMap>
+
+	<!-- 홀 시트 -->
+	<resultMap id="hallSeat" type="kh.study.consupport.common.vo.HallSeatVO">
+		<result property="hallCode" column="HALL_CODE"/>
+		<result property="hallSeatRCnt" column="HALL_SEAT_R_CNT"/>
+		<result property="hallSeatSCnt" column="HALL_SEAT_S_CNT"/>
+		<result property="hallSeatACnt" column="HALL_SEAT_A_CNT"/>
+	</resultMap>
+	
+	<!-- 장르 -->
+	<resultMap id="genre" type="kh.study.consupport.common.vo.GenreVO">
+		<id property="genreCode" column="GENRE_CODE"/>
+		<result property="genreName" column="GENRE_NAME"/>
+	</resultMap>
+	
+	
+	
+
+	<!--======================================================================================================================================================================================== -->
+
+	<select id="hallList" resultMap="hall">
+		SELECT HALL_CODE
+		, HALL_NAME
+		, HALL_SEAT_CNT
+		, HALL_RENT_PRICE
+		, USER_ID
+		FROM HALL
+	</select>
+
+	<!--======================================================================================================================================================================================== -->
+
+	<select id="genreList" resultMap="genre">
+		SELECT GENRE_CODE
+		, GENRE_NAME
+		FROM GENRE
+		ORDER BY GENRE_CODE
+	</select>
+
+	<!--======================================================================================================================================================================================== -->
+	<!-- 콘서트 코드 생성 -->
+	<select resultType="String" id="concertCode">
+		SELECT 'CONCERT_' || LPAD( NVL( MAX( TO_NUMBER(SUBSTR(CONCERT_CODE,9)) )+1,
+		1), 6, '0')
+		FROM CONCERT
+	</select>
+	<!--======================================================================================================================================================================================== -->
+
+	<!-- 콘서트 등록 -->
+	<insert id="regConcert">
+		INSERT INTO CONCERT(
+		CONCERT_CODE
+		, HALL_CODE
+		, USER_ID
+		, CONCERT_NAME
+		, CONCERT_TICKETING_DATE
+		, CONCERT_RATED
+		, GENRE_CODE
+		, HALL_DATE_CODE
+		) VALUES(
+		#{concertCode}
+		, #{hallCode}
+		, #{userId}
+		, #{concertName}
+		, #{concertTicketingDate}
+		, #{concertRated}
+		, #{genreCode}
+		, #{hallDateCode}
+		)
+	</insert>
+	<!--======================================================================================================================================================================================== -->
+
+	<!-- 가격 등록 -->
+	<insert id="insertConcertPrice">
+		INSERT INTO CONCERT_PRICE(
+		CONCERT_CODE
+		, CONCERT_PRICE_R
+		, CONCERT_PRICE_S
+		, CONCERT_PRICE_A
+		) VALUES (
+		#{concertCode}
+		, #{concertPrice.concertPriceR}
+		, #{concertPrice.concertPriceS}
+		, #{concertPrice.concertPriceA}
+		)
+	</insert>
+	<!--======================================================================================================================================================================================== -->
+
+	<!-- 이미지 등록 -->
+	<insert id="insertConcertImg">
+		INSERT INTO CONCERT_IMG(
+		CONCERT_IMG_CODE
+		, CONCERT_IMG_NAME_ORIGIN
+		, CONCERT_IMG_NAME_ATTACHED
+		, CONCERT_IMG_IS_MAIN
+		, CONCERT_CODE
+		)
+		<foreach collection="concertImgList" item="concertImg"
+			separator="UNION ALL" index="i">
+			SELECT
+			(SELECT 'C_IMG_'||LPAD(NVL(MAX(TO_NUMBER(SUBSTR(CONCERT_IMG_CODE,7))), 0) +
+			1
+			+ #{i}, 6, 0)
+			FROM CONCERT_IMG)
+			, #{concertImg.concertImgNameOrigin}
+			, #{concertImg.concertImgNameAttached}
+			, #{concertImg.concertImgIsMain}
+			, #{concertCode}
+			FROM DUAL
+		</foreach>
+	</insert>
+
+	<!--======================================================================================================================================================================================== -->
+
+	<!-- 아티스트 정보 수정 -->
+	<update id="updateArtist">
+		UPDATE ARTIST
+		SET
+		ARTIST_NAME = #{artistName}
+		, ARTIST_DETAIL = #{artistDetail}
+		WHERE USER_ID = #{userId}
+	</update>
+
+	<!--======================================================================================================================================================================================== -->
+
+	<!-- 아티스트 상세 조회 -->
+	<select id="selectArtistDetail">
+		SELECT USER_ID
+		, ARTIST_NAME
+		, ARTIST_DETAIL
+		FROM ARTIST
+		WHERE USER_ID = #{userId}
+	</select>
+
+	<!-- 홀 정보 불러오기 -->
+	<select id="hallInfo" resultMap="hall">
+		SELECT HALL.HALL_CODE
+		, HALL_NAME
+		, HALL_RENT_PRICE
+		, HALL_DETAIL
+		, USER_ID
+
+		, HALL_DATE_CODE
+		, TO_CHAR(HALL_RENT_DATE, 'yyyy-MM-dd hh24:mi:ss') AS HALL_RENT_DATE
+
+		, HALL_SEAT_R_CNT
+		, HALL_SEAT_S_CNT
+		, HALL_SEAT_A_CNT
+
+		, HALL_IMG_CODE
+		, HALL_IMG_NAME_ATTACHED
+		, HALL_IMG_IS_MAIN
+		FROM HALL
+		, HALL_SEAT SEAT
+		, HALL_IMG IMG
+		, HALL_DATE DAT
+		WHERE HALL.HALL_CODE = #{hallCode}
+		AND HALL.HALL_CODE = SEAT.HALL_CODE
+		AND HALL.HALL_CODE = IMG.HALL_CODE
+		AND HALL.HALL_CODE = DAT.HALL_CODE
+		AND HALL_STATUS = 'EMPTY'
+	</select>
+	
+	<update id="hallStatusUpdate">
+		UPDATE HALL_DATE
+		SET
+		HALL_STATUS = 'BOOKED'
+		WHERE HALL_DATE_CODE = #{hallDateCode}
+	</update>
+	
+
+<!--======================================================================================================================================================================================== -->
+
+	<!-- 내 공연 팔린좌석 그래프로 보기 -->
+	<select id="selectSoldRSA_cnt" resultType="HashMap">
+		SELECT
+		    R.CONCERT_CODE
+		    , (SELECT CONCERT_NAME FROM CONCERT WHERE CONCERT_CODE = R.CONCERT_CODE) AS CONCERT_NAME
+		    , SOLD_SEAT_R_CNT
+		    , SOLD_SEAT_S_CNT
+		    , SOLD_SEAT_A_CNT
+		FROM
+		    (SELECT 
+		        CONCERT_CODE
+		        , COUNT(USER_ID) AS SOLD_SEAT_R_CNT
+		    FROM TICKET
+		    WHERE SEAT_CODE LIKE 'R_%'
+		    AND CONCERT_CODE IN
+		        (SELECT CONCERT_CODE FROM CONCERT WHERE USER_ID = #{userId})
+		    GROUP BY CONCERT_CODE) R
+
+		    , (SELECT 
+		        CONCERT_CODE
+		        , COUNT(USER_ID) AS SOLD_SEAT_S_CNT
+		    FROM TICKET
+		    WHERE SEAT_CODE LIKE 'S_%'
+		    AND CONCERT_CODE IN
+		        (SELECT CONCERT_CODE FROM CONCERT WHERE USER_ID = #{userId})
+		    GROUP BY CONCERT_CODE) S
+
+		    , (SELECT 
+		        CONCERT_CODE
+		        , COUNT(USER_ID) AS SOLD_SEAT_A_CNT
+		    FROM TICKET
+		    WHERE SEAT_CODE LIKE 'A_%'
+		    AND CONCERT_CODE IN
+		        (SELECT CONCERT_CODE FROM CONCERT WHERE USER_ID = #{userId})
+		    GROUP BY CONCERT_CODE) A
+
+		WHERE R.CONCERT_CODE = S.CONCERT_CODE
+		AND R.CONCERT_CODE = A.CONCERT_CODE
+	</select>
+
+	<!-- 내 공연 매출 정보 그래프로 보기 -->
+	<select id="selectSoldRSA_amount" resultType="HashMap">
+		SELECT
+		    R.CONCERT_CODE
+		    , (SELECT CONCERT_NAME FROM CONCERT WHERE CONCERT_CODE = R.CONCERT_CODE) AS CONCERT_NAME
+		    , SOLD_SEAT_R_AMOUNT
+		    , SOLD_SEAT_S_AMOUNT
+		    , SOLD_SEAT_A_AMOUNT
+		FROM
+		    (SELECT 
+		        CONCERT_CODE
+		        , COUNT(USER_ID) * (SELECT CONCERT_PRICE_R FROM CONCERT_PRICE WHERE CONCERT_CODE = TICKET.CONCERT_CODE) AS SOLD_SEAT_R_AMOUNT
+		    FROM TICKET
+		    WHERE SEAT_CODE LIKE 'R_%'
+		    AND CONCERT_CODE IN
+		        (SELECT CONCERT_CODE FROM CONCERT WHERE USER_ID = #{userId})
+		    GROUP BY CONCERT_CODE) R
+
+		    , (SELECT 
+		        CONCERT_CODE
+		        , COUNT(USER_ID) * (SELECT CONCERT_PRICE_S FROM CONCERT_PRICE WHERE CONCERT_CODE = TICKET.CONCERT_CODE) AS SOLD_SEAT_S_AMOUNT
+		    FROM TICKET
+		    WHERE SEAT_CODE LIKE 'S_%'
+		    AND CONCERT_CODE IN
+		        (SELECT CONCERT_CODE FROM CONCERT WHERE USER_ID = #{userId})
+		    GROUP BY CONCERT_CODE) S
+
+		    , (SELECT 
+		        CONCERT_CODE
+		        , COUNT(USER_ID) * (SELECT CONCERT_PRICE_A FROM CONCERT_PRICE WHERE CONCERT_CODE = TICKET.CONCERT_CODE) AS SOLD_SEAT_A_AMOUNT
+		    FROM TICKET
+		    WHERE SEAT_CODE LIKE 'A_%'
+		    AND CONCERT_CODE IN
+		        (SELECT CONCERT_CODE FROM CONCERT WHERE USER_ID = #{userId})
+		    GROUP BY CONCERT_CODE) A
+
+		WHERE R.CONCERT_CODE = S.CONCERT_CODE
+		AND R.CONCERT_CODE = A.CONCERT_CODE
+	</select>
+
+	
+	
+	
+	
+	
+	
+
+</mapper>

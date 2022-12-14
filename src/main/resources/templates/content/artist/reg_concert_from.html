@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/base_layout}">
+
+<div layout:fragment="content">
+
+
+	<th:block>
+		<!-- datepicker 관련..! -->
+		<link rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.css">
+		<!-- <link rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap-responsive.css"> -->
+		<script
+			src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js"></script>
+		<script
+			src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.js"></script>
+		<script
+			src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.js"></script>
+
+		<style>
+			.datepicker {
+				padding-top: 0.75rem;
+				padding-bottom: 0.75rem;
+				text-align: center;
+			}
+			
+			.datepicker-dropdown {
+				top: 0;
+				left: 0
+			}
+			
+			.datepicker table tr td.today, span.focused {
+				border-radius: 50% !important
+			}
+			
+			thead tr:nth-child(2) {
+				background-color: #FF80AB !important
+			}
+			
+			thead tr:nth-child(3) th {
+				color: #FF80AB !important;
+				padding-top: 20px;
+				padding-bottom: 10px
+			}
+			
+			.dow, .old-day, .day, .new-day {
+				width: 40px !important;
+				height: 40px !important;
+				border-radius: 0px !important
+			}
+			
+			.old-day:hover, .day:hover, .new-day:hover, .month:hover, .year:hover,
+				.decade:hover, .century:hover {
+				border-radius: 50% !important;
+				background-color: #eee
+			}
+			
+			.active {
+				border-radius: 50% !important;
+				background-image: linear-gradient(#90CAF9, #64B5F6) !important;
+				color: #fff !important
+			}
+			
+			.prev, .next, .datepicker-switch {
+				border-radius: 0 !important;
+				padding: 20px 10px !important;
+				text-transform: uppercase;
+				font-size: 20px;
+				color: #fff;
+				opacity: 0.8
+			}
+			
+			.prev:hover, .next:hover, .datepicker-switch:hover {
+				background-color: inherit !important;
+				opacity: 1
+			}
+		</style>
+	</th:block>
+	
+	
+	
+	<div class="container-fluid row">
+	
+	
+<!-- ============================================================================================================================================================================================================= -->
+		
+		<div class="col-2">
+			　<!-- 여기 건드리지마 -->
+		</div>
+		
+<!-- ============================================================================================================================================================================================================= -->
+		
+		<div class="transparentDivL col-4 mt-3" style="width: 540px;">
+			<img src="/img/concert_01.webp"  style="border-radius: 2%; height: 850px;">
+		</div>
+		
+<!-- ============================================================================================================================================================================================================= -->
+
+		<div class="transparentDivR col-4 mt-3">		
+		
+			<div style="margin: 15px auto 0;">
+				<h2>콘서트 등록</h2>
+				<hr class="myHr">
+			</div>
+	
+			<form id="regConcert">
+				<input type="hidden" th:value="${hall.userId}" name="userId"> <!-- userId 삽입 -->
+				
+				
+				<div class="row myFormRow">
+					<label for="" class="form-label">콘서트명</label>
+					<div class="col-12 input-group">
+						<input type="text"
+							aria-label="First name" class="form-control" name="concertName">
+					</div>
+				</div>
+	
+	
+				<div class="row myFormRow">
+					<label for="" class="form-label">콘서트 장르</label>
+					<div class="col-12 input-group">
+						<select class="form-select"
+							name="genreCode" aria-label="Default select example">
+							<option value="" selected>장르를 지정해 주세요</option>
+							<th:block th:each="gen:${genreList}">
+								<option th:value="${gen.genreCode}">[[${gen.genreName}]]</option>
+							</th:block>
+						</select>
+					</div>
+				</div>
+	
+	
+				<div class="row myFormRow">
+					<div class="col-6" >
+						<label for="" class="form-label">콘서트 홀 및 콘서트 날짜</label>
+						<input type="button" class="form-control btn btn-primary text-center" id="btnHallInfo" data-bs-toggle="modal" data-bs-target="#exampleModal" value="콘서트홀 목록" style="--bs-btn-padding-x: 0;">
+					</div>
+					
+					<div class="col-6" >
+						<label for="" class="form-label">티켓팅 일</label>
+						
+<!-- 						<div class="form-group row"> -->
+							<input type="text" id="dp1" class="form-control datepicker" placeholder="Select Date" name="concertTicketingDate" readonly>
+<!-- 						</div> -->
+						
+						
+						
+						<!-- <div class="input-datepicker">
+							<input class="form-control" type="text" name="concertTicketingDate" readonly>
+						</div> -->
+					</div>
+					
+					
+				</div>
+					
+					
+					
+					
+
+	
+				<div class="row myFormRow">
+					<label for="" class="form-label">가격</label>
+					<div class="col-12 input-group">
+						<span class="input-group-text">R석</span>
+						<input type="text" name="concertPrice.concertPriceR" aria-label="First name" class="form-control">
+						<span class="input-group-text">S석</span>
+						<input type="text" name="concertPrice.concertPriceS" aria-label="First name" class="form-control">
+						<span class="input-group-text">A석</span>
+						<input type="text" name="concertPrice.concertPriceA" aria-label="First name" class="form-control">
+					</div>
+				</div>
+			
+				
+				
+				<div class="row myFormRow">
+					<label for="" class="form-label">연령 제한</label>
+					<div class="col-12 input-group">
+						<select name="concertRated" class="form-select"
+							aria-label="Default select example">
+							<option value="" selected>연령 제한을 지정해 주세요</option>
+							<option value="All">전연령 관람 가능</option>
+							<option value="15+">15세 이상 관람 가능</option>
+							<option value="19+">청소년 관람 불가</option>
+						</select>
+					</div>
+				</div>
+			
+			
+				<div class="row myFormRow">
+					<div class="col-6" >
+						<label for="" class="form-label">Main Image</label>
+						<input class="form-control" type="file" name="imgMain">
+						<!-- <input class="form-control" type="file" name="mainImg"> -->
+					</div>
+					
+					<div class="col-6">
+						<label for="" class="form-label">Sub Image</label>
+						<input class="form-control" type="file" multiple name="imgsSub">
+						<!-- <input class="form-control" type="file" multiple name="subImgs"> -->
+					</div>
+				</div>
+					
+	<!-------------------------------------------------------------------------------  -->
+	
+				<!-- Modal -->
+				<div class="modal fade"  id="exampleModal" tabindex="-1"
+					aria-labelledby="exampleModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-xl">
+						<div class="modal-content"
+						style="max-width: 100%; background-image: linear-gradient(125deg,rgba(255,255,255,.1),rgba(255,255,255,.1) 70%);">
+							<div class="modal-header">
+								<h1 class="modal-title fs-5" id="exampleModalLabel">공연장을
+									골라주세요.</h1>
+								<button type="button" class="btn-close" data-bs-dismiss="modal"
+									aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<select	id="selectHallCode"
+										name="hallCode"
+										class="form-select"
+										onchange="loadHallInfo();"
+										aria-label="Default select example">
+									<option value="1" selected>콘서트 홀을 지정해 주세요</option>
+									<th:block th:each="ha:${hallList}">
+										<option th:value="${ha.hallCode}">[[${ha.hallName}]] | [[${ha.hallSeatCnt}]]석</option>
+									</th:block>
+								</select>
+								<hr>
+								<div id="loadHallInfoByAjax">
+	
+									<div id="hallDetail">
+										<!-- 상세정보 표시할 틀. -->
+										<!-- Ajax로 내용 갱신해주기 -->
+	
+									</div>
+	
+	
+									<select name="hallDateCode" class="form-select"
+										id="selectHallRentDate">
+										<!-- RentDate 목록을 표시할 틀. -->
+										<option value="" selected>콘서트 시간을 지정해 주세요</option>
+										<!-- Ajax로 내용 갱신해주기 -->
+									</select>
+	
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-primary"
+									data-bs-dismiss="modal">확인</button>
+							</div>
+						</div>
+					</div>
+				</div>
+	
+	<!----------------------------------------------------------------->
+	
+			</form>
+	
+			<div class="row myFormRow">
+				<div class="col-12" >
+					<button th:onclick="submitForm();" class="form-control btn btn-primary">공 연 신 청</button>
+				</div>
+			</div>
+	
+			<script type="text/javascript" th:src="@{/js/artist/reg_concert_form.js}"></script>
+		
+		</div>
+		
+		
+<!-- ============================================================================================================================================================================================================= -->
+
+		<div class="col-2">
+			　<!-- 여기 건드리지마 -->
+		</div>
+		
+<!-- ============================================================================================================================================================================================================= -->
+	
+	</div>
+	
+
+</div>
+</html>

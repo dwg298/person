@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz./thymeleaf/layout"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	  layout:decorate="~{layout/base_layout}"
+	  >
+
+
+<!----------------------------------------------------------- ---------------------------------------------------------------------------------------------->
+
+	<div layout:fragment="content" class="col text-start">
+	
+	
+	<th:block>
+		<link href="/css/artist/artist_manager.css" rel="stylesheet"/>
+	</th:block>
+	  
+
+	<div class="row">
+		<div class="col-12">
+			<div class="row">
+			
+				<div class="col-12" style="padding-left: 20.5%; margin-bottom: 15px; margin-top: 30px;">
+					<h3>아티스트 or 아티스트대기자</h3>
+				</div>
+					
+<!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+					
+					<div class="col-12">
+					
+						<table class="table text-center table-hover align-middle"
+						style="margin: auto; width: 60%; background:rgba(0,0,0,0.2);">
+						
+							<thead class="aaa">
+								<tr>
+									<th class="col-1" scope="col">No.</th>
+									<th class="col-2" scope="col">아티스트 정보</th>
+									<th class="col-3" scope="col">아티스트 정보</th>
+									<th class="col-3" scope="col">유저이름</th>
+									<th class="col-3" scope="col">아티스트?</th>
+								</tr>
+							</thead>
+							
+							
+<!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+
+
+							<tbody class="bbb">
+								<tr th:each="artist, iterState : ${artistList}">
+									<th scope="row" th:text="${iterState.count}"></th>
+									<td>
+										<a data-bs-toggle="modal" data-bs-target="#artistDetailModal" style="cursor: pointer">
+											<img th:src="|@{/img/artist/}${artist.artistImgList[0].artistImgNameAttached}|" 
+												 th:onclick="artistDetailModal([[${artist.userId}]])"
+												 style="height: 120px; width: 100px">
+										</a>
+									</td>
+									<td>[[${artist.artistName}]]</td>
+									<td>[[${artist.userId}]]</td>
+									<td>
+									
+									
+									
+										<div class="form-check form-check-inline">
+					                    	<input class="form-check-input" type="radio" 
+					                    		   th:name="|role_radio_${iterState.count}|"
+					                    	   	   th:checked="${artist.users.userRole eq 'ARTIST'}"
+					                    	   	   th:onclick="userRoleSet([[${artist.userId}]], 'A');"
+					                    	   	   style="cursor: pointer;">
+					                    	<label class="form-check-label">A</label>
+					                    </div>
+					                    
+					                    
+					                    
+										<div class="form-check form-check-inline">
+					                    	<input class="form-check-input" type="radio" 
+					                    		   th:name="|role_radio_${iterState.count}|" 
+					                    	   	   th:checked="${artist.users.userRole eq 'MEMBER'}"
+					                    	   	   th:onclick="userRoleSet([[${artist.userId}]], 'M');"
+					                    	   	   style="cursor: pointer;">
+					                    	<label class="form-check-label">M</label>
+					                    </div>
+					                    
+					                    
+					                    
+									</td>
+									
+								</tr>
+							</tbody>
+						</table>
+						<div>
+							
+						</div>
+						
+					</div>
+<!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->					                    		   
+				</div>
+			</div>
+		</div>
+
+
+
+	<!-- 아티스트 상세 보기 모달 -->
+	<div class="modal fade" id="artistDetailModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-xl">
+			<div class="modal-content">
+				<div class="modal-header" >
+					<h1 class="modal-title fs-5" id="exampleModalLabel">ARTIST</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				
+<!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+				
+				<div id="artistDetailAjax" class="modal-body">
+					<div id="cardForArtistDetail" class="card mb-3" style="max-width: 100%;">
+
+						<!-- 아티스트 상세 보기 영역 -->
+
+					</div>
+				</div>
+				
+<!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+				
+				
+					<div class="modal-footer">
+						<button id="modalFooterBtn" type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+					</div>
+			</div>
+		</div>
+	</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<script src="https://code.jquery.com/jquery-latest.min.js"></script>
+	<script type="text/javascript" src="/js/admin/artist_manager.js"></script>
+
+	</div>
+	
+<!--------------------------------------------------------------------------------------------------------------------------------------------------------->
+	
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz./thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	layout:decorate="~{layout//base_layout}">
+<!--------------------------------------------------------------------------------------------------------------------------------------------------------->
+
+<div layout:fragment="content">
+
+
+	<div class="row">
+<!-- ============================================================================================================================================================================================================= -->
+		
+		<div class="col-2">
+			　<!-- 여기 건드리지마 -->
+		</div>
+		
+<!-- ============================================================================================================================================================================================================= -->
+		<div class="transparentDivL col-4 mt-3" style="width: 540px;">
+			<div class="row align-items-center" style="height: 100%;">
+				<div class="col-12" >
+					<img class="artistMainImgOfRegArtistForm" id="blah" src="/img/artist_01.jpg"  style="border-radius: 2%; height: 850px; ">
+				</div>
+			</div>
+		</div>
+		
+<!-- ============================================================================================================================================================================================================= -->
+			
+		<div class="transparentDivR col-4 mt-3">
+
+			<div style="margin: 15px auto 0;">
+				<th:block sec:authorize="hasAnyRole('ROLE_MEMBER')">
+					<h2>아티스트 신청</h2>
+				</th:block>
+				<th:block sec:authorize="hasAnyRole('ROLE_ARTIST')">
+					<h2>아티스트 정보 수정</h2>
+				</th:block>
+				
+				<hr class="myHr">
+			</div>
+			
+<!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+
+				<form id="regArtistForm" action="/member/regArtist" method="post" enctype="multipart/form-data">
+		
+<!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->						
+			
+				<div class="row myFormRow">
+					<div class="col-6" >
+						<label for="" class="form-label">아티스트 명</label>
+						<input type="text" class="form-control" name="artistName">
+					</div>
+					
+					<div class="col-6">
+						　<!-- 여기 건드리지마 -->
+					</div>
+				</div>
+			
+<!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->						
+				
+				<div class="row myFormRow">
+					<div class="col-12" >
+						<label for="" class="form-label">아티스트 상세</label>
+						<textarea class="form-control" rows="15" cols="50" name="artistDetail" style="resize:none"></textarea>
+					</div>
+				</div>
+			
+<!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+
+	
+				<div class="row myFormRow">
+					<div class="col-6" >
+						<label for="" class="form-label">Main Image</label>
+						<input class="form-control" type="file" name="imgMain" id="imgInp">
+						<!-- <input class="form-control" type="file" name="mainImg"> -->
+					</div>
+					
+					<div class="col-6">
+						<label for="" class="form-label">Sub Image</label>
+						<input class="form-control" type="file" multiple name="imgsSub">
+						<!-- <input class="form-control" type="file" multiple name="subImgs"> -->
+					</div>
+				</div>
+			
+<!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->						
+				
+				
+				<div class="row myFormRow">
+					<div class="col-12" >
+					
+						<th:block sec:authorize="hasAnyRole('ROLE_MEMBER')">
+							<button type="button" class="form-control btn btn-primary" onclick="submitForm('#regArtistForm', '신청')">
+								신 청
+							</button>
+						</th:block>
+							
+						<th:block sec:authorize="hasAnyRole('ROLE_ARTIST')">
+							<button type="button" class="form-control btn btn-primary" onclick="submitForm('#regArtistForm', '수정')">
+								수정 완료
+							</button>
+						</th:block>
+							
+					</div>
+				</div>
+	
+				
+				
+<!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->						
+					
+			</form>
+			
+			
+					
+					
+					
+					
+
+<!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->						
+					
+		</div>		
+	</div>
+	
+	
+	<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+	<script type="text/javascript">
+	
+		function submitForm(formId, str){
+			var regForm = document.querySelector(formId);
+			
+			Swal.fire({
+				title: '작성을 완료하시겠습니까',
+				showCancelButton: true,
+				cancelButtonText: 'Back',
+				confirmButtonText: 'Done',
+			}).then((result) => {	// then start
+				if (result.isConfirmed){
+					
+					
+					$(formId).find('input[type!="hidden"]').each(function(){
+						
+					    if(!$(this).val()) {
+					    	
+					    	Swal.fire({
+								icon: 'error'
+								, title: `비어있는 항목이 있습니다`
+							});
+					    	
+					    	return;
+					    }
+					    else {
+					    	
+							Swal.fire({
+								icon: 'success'
+								, title: `${str} 완료!`
+								
+								, timer: 1500
+								, didOpen: () => { timerInterval = setInterval(() => { /* DO NOTHING :) */ }, 100); }
+								, willClose: () => { clearInterval(timerInterval); }
+								
+							}).then(() => {
+								
+								regForm.submit();
+
+							});
+					
+					    }
+					    
+					});
+					
+			
+				}
+			});		// then end
+		}
+	
+		
+		
+		
+		
+		
+		$(function() {
+			$("#imgInp").on('change', function() {
+				readURL(this);
+			});
+		});
+
+		function readURL(input) {
+			if (input.files && input.files[0]) {
+				var reader = new FileReader();
+
+				reader.onload = function(e) {
+					$('#blah').attr('src', e.target.result);
+					$('#blah').css("height", "auto");
+					$('#blah').css("opacity", "1.0");
+					$('#blah').css("background-size", "50% 50%");
+				}
+
+				reader.readAsDataURL(input.files[0]);
+			}
+		}
+	</script>
+	
+	
+</div>
+
+<!--------------------------------------------------------------------------------------------------------------------------------------------------------->
+
+</html>

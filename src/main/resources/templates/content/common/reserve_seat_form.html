@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html	lang="en" xmlns:th="http://www.thymeleaf.org">
+		<!-- xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+		xmlns:layout="http://www.ultrap.net.nz./thymeleaf/layout"
+		layout:decorate="layout/base_layout"
+		 -->
+		
+<!-- <head>
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Movie Seat Booking</title>
+</head> -->
+
+<th:block layout:fragment="content">
+
+	<th:block>
+		<link rel="stylesheet" href="/css/common/reserve_seat_form.css" />
+	
+		<!-- swal -->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.css">
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.js"></script>
+		
+		<!-- jQuery  -->
+		<script	src="https://code.jquery.com/jquery-latest.min.js"></script>
+	    
+		<!-- iamport.payment.js --> 
+	    <script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
+	</th:block>
+
+
+	<ul class="showcase">
+		<li>
+			<div class="seat seatR">R</div>
+			<div class="seat seatS">S</div>
+			<div class="seat">A</div>
+			<div class="col"> <small>Available</small> </div>
+		</li>
+		<li>
+			<div class="seat selected"></div> <small>Selected</small>
+		</li>
+		<li>
+			<div class="seat sold"></div> <small>Sold</small>
+		</li>
+	</ul>
+
+
+
+	<div class="container">
+		<div class="screen"></div>
+		
+
+
+		<th:block th:if="${ticketList.size() == 40}">
+		<div class="row">
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+		</div>
+		<div class="row">
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+		</div>
+		<div class="row">
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+		</div>
+		<div class="row">
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+		</div>
+		<div class="row">
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+			<div class="seat seat40"></div>
+		</div>
+		</th:block>
+		
+
+		<th:block th:if="${ticketList.size() == 70}">
+		<div class="row">
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+		</div>
+		<div class="row">
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+		</div>
+		<div class="row">
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+		</div>
+		<div class="row">
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+		</div>
+		<div class="row">
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+		</div>
+		<div class="row">
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+		</div>
+		<div class="row">
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+			<div class="seat seat70"></div>
+		</div>
+		</th:block>
+		
+		
+		<th:block th:if="${ticketList.size() == 100}">
+		<div class="row">
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+		</div>
+		<div class="row">
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+		</div>
+		<div class="row">
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+		</div>
+		<div class="row">
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+		</div>
+		<div class="row">
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+		</div>
+		<div class="row">
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+		</div>
+		<div class="row">
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+		</div>
+		<div class="row">
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+			<div class="seat seat100"></div>
+		</div>
+		<div class="row" style="display: flex; justify-content : center;">
+			<div class="seat"></div>
+			<div class="seat"></div>
+			<div class="seat"></div>
+			<div class="seat"></div>
+		</div>
+		</th:block>
+		
+		
+	</div>
+	
+	
+	
+	<br>
+	
+	<form id="reserveSeatForm" name="reserveSeatForm" onsubmit="return false">
+		<input type="hidden" 	id="authorities" th:value="${authorities}" readonly>
+		<input type="hidden" 	name="anonymousEmail" id="anonymousEmail" value="" readonly>
+		
+		<input type="hidden" 	name="hallSeatRCnt" id="hallSeatRCnt" value="0" readonly>
+		<input type="hidden" 	name="hallSeatSCnt" id="hallSeatSCnt" value="0" readonly>
+		<input type="hidden" 	name="hallSeatACnt" id="hallSeatACnt" value="0" readonly>
+		
+		<input type="hidden"	name="hallCode" th:value="${concert.hallCode}">
+		<input type="hidden"	name="concertCode" th:value="${concert.concertCode}">
+		<input type="hidden"	name="ticketCodeList" id="ticketCodeList">
+		<input type="hidden"	name="salesCode" id="salesCode">
+		
+		<input type="number"	name="salesAmount" id="salesAmount" class="fontBox" style="width:80px; text-align:right; margin-right:7px;" readonly><span class="fontBox">매　　　</span>
+		<input type="number" 	name="salesTotalPrice" id="salesTotalPrice" class="fontBox" style="width:120px; text-align:right; margin-right:7px;" readonly><span class="fontBox">원</span>
+		
+		<br>
+		
+		<input type="hidden" 	name="couponValue" id="couponValue" value="0" readonly>
+		
+		<br>
+		<br>
+		
+		<input type="text" 		name="couponCode" id="couponCode" class="fontBox" style="width:230px;" placeholder="여기에 쿠폰 코드 입력">　
+		
+		<button type="button" onclick="loadCoupon();" class="fontBox" style="width:60px;">조회</button>
+	</form>
+	
+	
+	<br>
+	<div><span id="isExistCoupon" style="color:red">활성화된 쿠폰이 없습니다.</span></div>
+	
+	
+	<br>
+	<br>
+	<button type="button" onclick="tryPay();" style="height: 50px; font-size: 1.2rem;"><b>지금 바로 결제</b></button>
+	
+	<br>
+	
+	
+	
+	<!-- 종료된 요청입니다. 일때 확인용 salesCode. -->
+	<span id="uidForDebugging" style="display:scroll; position:fixed; bottom:3px; left:3px; color: #222131"></span>
+	
+	
+	
+	<script th:inline="javascript">
+		const seats = document.querySelectorAll(".row .seat");
+	
+		const ticketList = /*[[${ticketList}]]*/[];	// 대괄호 안넣으면 오류는 안나는데 빨간줄뜸 거지같은 타임리프 문법 수준...
+		window.resizeTo(750, 800+(ticketList.length*2));
+		
+		console.log(ticketList)
+///////////////////////////////////////////////////// 넣자.
+		let concertPriceR = /*[[${concert.concertPrice.concertPriceR}]]*/[];
+		let concertPriceS = /*[[${concert.concertPrice.concertPriceS}]]*/[];
+		let concertPriceA = /*[[${concert.concertPrice.concertPriceA}]]*/[];
+///////////////////////////////////////////////////// 넣자.
+		let hallSeatRCnt	= 0;
+		let hallSeatSCnt	= 0;
+		let hallSeatACnt	= 0;
+		
+		let salesAmount		= 0;
+		let salesTotalPrice	= 0;
+		
+		var ticketCodeList = [];
+		function addSeat(ticketCode) { ticketCodeList.push(ticketCode); }
+		function delSeat(ticketCode) {
+			for (let i = 0; i < ticketCodeList.length; i++) {
+				if (ticketCodeList[i] === ticketCode) {
+					ticketCodeList.splice(i, 1);
+					return;
+				}
+			}
+		}
+		
+		
+		let arrnum = 0;
+		for (const s of seats) {
+			// seatCode 포함된 문자에 따라 R석 S석 표시
+			if (ticketList[arrnum].seatCode.indexOf('R_') > -1)
+				s.classList.add('seatR');
+			else if (ticketList[arrnum].seatCode.indexOf('S_') > -1)
+				s.classList.add('seatS');
+	
+	
+			// seatStatus 값이 BOOKED 라면 이미 팔린 좌석 표시
+			if (ticketList[arrnum].seatStatus.indexOf('BOOKED') > -1)
+				s.classList.add('sold');
+	
+	
+			// 좌석버튼마다 ticketCode 값 주입
+			s.dataset.ticketCode = ticketList[arrnum].ticketCode;
+	
+	
+			// 좌석버튼마다 클릭이벤트 주입...! 햐아아아아압!
+			s.addEventListener("click", function() {
+				if (s.classList.contains('sold'))
+					return;
+	
+				if (!s.classList.contains('selected')) {
+					if(ticketCodeList.length == 4){
+						Swal.fire({ heightAuto: false , backdrop: "rgba(0,0,0,0.4)"	// swal 뜰 때 화면 위로 올라감 방지
+							, icon: 'warning'
+							, title: '1인 4좌석까지만 구매 가능합니다'
+							//, text: ``
+						}).then((result) => {
+								refreshByForce = true;
+								history.go(0);
+						});
+						
+						
+						return;
+					}
+					
+					
+					s.classList.add("selected");
+					addSeat(s.dataset.ticketCode);
+	
+	
+					if (s.classList.contains('seatR')) {
+						hallSeatRCnt++;
+						salesTotalPrice += concertPriceR;
+					}
+					else if (s.classList.contains('seatS')) {
+						hallSeatSCnt++;
+						salesTotalPrice += concertPriceS;
+					}
+					else {
+						hallSeatACnt++;
+						salesTotalPrice += concertPriceA;
+					}
+				}
+				else {
+					s.classList.remove("selected");
+					delSeat(s.dataset.ticketCode);
+	
+	
+					if (s.classList.contains('seatR')) {
+						hallSeatRCnt--;
+						salesTotalPrice -= concertPriceR;
+					}
+					else if (s.classList.contains('seatS')) {
+						hallSeatSCnt--;
+						salesTotalPrice -= concertPriceS;
+					}
+					else {
+						hallSeatACnt--;
+						salesTotalPrice -= concertPriceA;
+					}
+				}
+				
+				updateView();
+				
+//				alert('몇장? : ' + salesAmount + '\n'
+//					+ '코드? : ' + ticketCodeList);
+			})
+			arrnum++;
+		}
+	
+		function updateView(){
+			document.querySelector('#hallSeatRCnt').value = hallSeatRCnt;
+			document.querySelector('#hallSeatSCnt').value = hallSeatSCnt;
+			document.querySelector('#hallSeatACnt').value = hallSeatACnt;
+			salesAmount = (hallSeatRCnt+hallSeatSCnt+hallSeatACnt);
+			
+			document.querySelector('#ticketCodeList').value = ticketCodeList;
+			document.querySelector('#salesAmount').value = salesAmount;
+			document.querySelector('#salesTotalPrice').value = salesTotalPrice;
+			
+			const couponValue = document.querySelector('#couponValue').value;
+			if(couponValue > 0)
+				document.querySelector('#salesTotalPrice').value = salesTotalPrice - (salesTotalPrice * couponValue/100);
+		}
+	</script>
+	
+	<script type="text/javascript" src="/js/common/common.js"></script>
+	<script type="text/javascript" src="/js/common/reserve_seat_form.js"></script>
+	
+</th:block>
+</html>

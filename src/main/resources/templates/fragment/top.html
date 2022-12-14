@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+
+<th:block th:fragment="top">
+
+	<th:block>
+		<!-- 아티스트 상세보기 모달에 적용되는 css -->
+		<link href="/css/common/concert_list.css" rel="stylesheet"/>
+		<style>
+		
+		#modalAlert {
+			top: 80px;
+			margin-top: -50px;
+		}
+		
+		.login-page {
+			width: 360px;
+			padding: 0 0;
+			margin: 0 0;
+		
+			/* padding-top: 100px; */
+		}
+		
+		.form {
+			position: relative;
+			z-index: 1;
+			background: #FFFFFF;
+			max-width: 360px;
+			margin: 0 auto 100px;
+			padding: 45px;
+			text-align: center;
+			box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0
+				rgba(0, 0, 0, 0.24);
+		}
+		
+		.form input {
+			font-family: 'Roboto', sans-serif;
+			outline: 0;
+			background: #f2f2f2;
+			width: 100%;
+			border: 0;
+			margin: 0 0 15px;
+			padding: 15px;
+			box-sizing: border-box;
+			font-size: 14px;
+		}
+		
+		.form button {
+			font-family: 'Roboto', sans-serif;
+			text-transform: uppercase;
+			outline: 0;
+			background: #414358; /* ※중요※ 버튼색 */
+			width: 100%;
+			border: 0;
+			padding: 15px;
+			color: #FFFFFF;
+			font-size: 14px;
+			-webkit-transition: all 0.3 ease;
+			transition: all 0.3 ease;
+			cursor: pointer;
+		}
+		
+		.form button:hover, .form button:active, .form button:focus {
+			background: #52587a;
+		}
+		
+		.form .message {
+			margin: 15px 0 0;
+			color: #b3b3b3;
+			font-size: 12px;
+		}
+		
+		.form .message a {
+			color: #414358; /* ※중요※ 버튼색 */
+			text-decoration: none;
+		}
+		
+		.form .register-form {
+			display: none;
+		}
+		
+		.container .info {
+			margin: 50px auto;
+			text-align: center;
+		}
+		
+		.container .info h1 {
+			margin: 0 0 15px;
+			padding: 0;
+			font-size: 36px;
+			font-weight: 300;
+			color: #1a1a1a;
+		}
+		
+		.container .info span {
+			color: #4d4d4d;
+			font-size: 12px;
+		}
+		
+		.container .info span a {
+			color: #000000;
+			text-decoration: none;
+		}
+		
+		.container .info span .fa {
+			color: #EF3B3A;
+		}
+		</style>
+	</th:block>
+
+
+	<!--------------------------------------------------------------------------------------------------------------------------------------------------------->
+
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary" style="width: 100%; height: 5.7rem; padding: 35px 0px;">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="/" style="font-family: 'Lobster', cursive; font-size: 4.5rem; margin-left: 30px;">CONSUPPORT</a>
+			<button class="navbar-toggler" type="button"
+				data-bs-toggle="collapse" data-bs-target="#navbarColor01"
+				aria-controls="navbarColor01" aria-expanded="false"
+				aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarColor01">
+				
+				<ul class="navbar-nav me-auto">
+					<!-- <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+					<li class="nav-item"><a class="nav-link" href="about.html">About</a>
+					</li>
+					<li class="nav-item"><a class="nav-link" href="contact.html">Contact</a>
+					</li>
+					<li class="nav-item"><a class="nav-link" href="pricing.html">Pricing</a>
+					</li>
+					<li class="nav-item"><a class="nav-link" href="faq.html">FAQ</a>
+					</li> -->
+				</ul>
+				
+				<!-- <form class="d-flex">
+					<input class="form-control me-sm-2" type="text"
+						placeholder="Search">
+					<button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+				</form> -->
+
+				<ul class="navbar-nav" style="margin-right: 30px; font-size: 1.5rem">
+					<th:block sec:authorize="hasRole('ROLE_ANONYMOUS')">
+						<li class="nav-item">
+							<a 	class="nav-link"
+								data-bs-toggle="modal"
+								data-bs-target="#modalLogin"
+								style="cursor: pointer">LOGIN | JOIN</a>
+						</li>
+					</th:block>
+
+					<th:block sec:authorize="hasAnyRole('ROLE_MEMBER', 'ROLE_ARTIST', 'ROLE_OWNER', 'ROLE_ADMIN')">
+						<li class="nav-item">
+						</li>
+						<div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+							
+							<div class="btn-group" role="group" >
+								<button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle " data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<h5>MY MENU</h5>
+								</button>
+								<div class="dropdown-menu" aria-labelledby="btnGroupDrop1" >
+								
+								
+									
+								
+								
+								
+								
+									<a class="dropdown-item" href="/member/myPage">예매목록</a>
+									
+									<a class="dropdown-item" href="/member/pwCheckForm">내 정보 수정</a>
+									
+									<th:block sec:authorize="hasAnyRole('ROLE_ARTIST')">
+										<a class="dropdown-item" href="/member/regArtistForm">아티스트 정보 수정</a>
+									</th:block>
+									
+									<hr style="margin: 3px 0;">
+									
+									
+									
+									<th:block sec:authorize="hasAnyRole('ROLE_MEMBER')">
+										<a class="dropdown-item" href="/member/regArtistForm">아티스트 신청</a> 
+									</th:block>
+									
+									<th:block sec:authorize="hasAnyRole('ROLE_OWNER')">
+										<a class="dropdown-item" href="/owner/regHallForm">공연장 등록</a>
+									</th:block>
+									
+									<th:block sec:authorize="hasAnyRole('ROLE_ARTIST')">
+										<a class="dropdown-item" href="/artist/regConcertForm">공연 등록</a>
+										<a class="dropdown-item" href="/artist/incomeManager">공연 매출 관리</a>
+									</th:block>
+									
+									<th:block sec:authorize="hasAnyRole('ROLE_MEMBER', 'ROLE_ARTIST')">
+										<a class="dropdown-item" href="#">오너 등록</a>
+									</th:block>
+										
+									<th:block sec:authorize="hasAnyRole('ROLE_ADMIN')">
+										<a class="dropdown-item" href="/admin/artistManager">아티스트 관리</a>
+										<a class="dropdown-item" href="/admin/concertManager">콘서트 관리</a>
+										<a class="dropdown-item" href="/admin/ownerManager">오너 권한 관리</a>
+									</th:block><hr style="margin: 3px 0;">
+										
+										
+										
+										
+									<a class="dropdown-item" href="/board/qboardList">고객센터</a>
+										
+									<a class="dropdown-item" href="/logout">LOGOUT</a>
+									
+								</div>
+							</div>
+						</div>
+					</th:block>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+
+
+
+
+
+<!-- ================================================================================================================================================================================================================================================================================ -->
+	<!-- 따라지 -->
+	
+
+
+<!-- ================================================================================================================================================================================================================================================================================ -->
+
+
+
+
+	<!-- Login a태그 클릭 시 실행되는 Modal -->
+	<div id="modalLogin" class="modal fade" tabindex="-1"
+		aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog row">
+			<div class="modal-content"
+				style="background-color: rgba(0, 0, 0, 0); border:none; backdrop-filter: none; background-image:url('');  box-shadow: none;">
+
+				<button type="button" class="btn-close btnModalClose"
+					data-bs-dismiss="modal" aria-label="Close"
+					style="position: absolute; top: 1.0rem; right: 5.0rem;"></button>
+
+				<div class="row">
+					<div class="col login-page">
+						<div class="form">
+
+							<form class="register-form" name="registerForm"
+								autocomplete="off">
+								
+								<!-- 자동완성 방지용 더미태그 -->
+								<input name="username_dummy" type="text" style="display: none" aria-hidden="true"> 
+								<input name="password_dummy" type="password" style="display: none" aria-hidden="true">
+
+								<input 	name="userId"
+										type="email" 
+										placeholder="ID (email)" 
+										autocomplete="off" 
+										title="이메일 형식으로 적어주세요."
+										required/> 
+								
+								<input 	name="userPw"
+										type="password"
+										placeholder="비밀번호"
+										autocomplete="off"
+										title="영문 대소문자, 숫자를 포함한 6~16자리"
+										required/> 
+								
+								<input name="userPwChecker" type="password" placeholder="비밀번호 확인" autocomplete="off" required /> 
+								
+								<input 	name="userName"
+										type="text" 
+										placeholder="별명" 
+										title="특수문자를 제외한 3~10자리"
+										required />
+
+								<input name="userAddr" onclick="searchAddr();" type="text" placeholder="주소" required readonly/> 
+								
+								<input name="userAddrDetail" type="text" placeholder="상세주소" />
+								
+								<input 	name="userBirth"
+										type="date" 
+										placeholder="생년월일" 
+										value="2000-01-01" 
+										title="연/월/일 클릭 후 ↑↓방향키로 변경도 가능합니다."
+										required/>
+								
+								<input 	name="userTell"
+										type="text"
+										placeholder="연락처"
+										title="000-0000-0000 형식으로 적어주세요."
+										required/>
+
+								<button type="button" onclick="join()">create</button>
+								<p class="message">
+									<a style="cursor: pointer;">로그인 화면으로</a>
+								</p>
+							</form>
+
+							<form class="login-form" name="loginForm">
+								<input name="userId" type="text" placeholder="ID (email)" /> 
+								<input name="userPw" type="password" placeholder="Password" />
+
+								<button type="button" onclick="login()">login</button>
+								<p class="message">
+									회원이 아니신가요?　<a style="cursor: pointer;">가입하러가기</a>
+								</p>
+							</form>
+
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+	<input type="hidden" id="openLogin" th:value="${openLogin}" />
+
+
+	<!--------------------------------------------------------------------------------------------------------------------------------------------------------->
+
+
+	<!-- Alert! -->
+	<div id="modalAlert" class="modal" tabindex="-1" style="color: #414358; z-index: 1070;">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+
+				<div class="modal-body">
+					<div class="row">
+						<div class="col modalAlert_InnerContent">alert msg</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+
+	<!--------------------------------------------------------------------------------------------------------------------------------------------------------->
+
+
+
+
+
+
+
+
+
+
+<!-- ========================================================================================================================================================== -->
+
+	<!-- 콘서트 상세 보기 모달 -->
+	<div class="modal fade" id="concertDetailModalForReserve" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-xl">
+			<div class="modal-content">
+				<div class="modal-header" >
+					<h1 class="modal-title fs-5" id="exampleModalLabel">CONCERT</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				
+<!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+				
+				<div id="concertDetailForReserveAjax" class="modal-body">
+					<div id="cardForConcertDetailForReserve" class="card mb-3" style="max-width: 100%;">
+
+						<!-- 콘서트 상세 보기 영역 -->
+
+					</div>
+				</div>
+				
+<!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+				
+				
+					<div class="modal-footer">
+						<button id="modalFooterBtn" type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+					</div>
+			</div>
+		</div>
+	</div>
+
+
+<!-- ========================================================================================================================================================== -->
+
+
+	<!-- 아티스트 상세 보기 모달 -->
+	<div class="modal fade" id="artistDetailModalForReserve" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header" >
+					<h1 class="modal-title fs-5" id="exampleModalLabel">ARTIST</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				
+<!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+				
+				<div id="artistDetailForReserveAjax" class="modal-body">
+					<div id="cardForArtistDetailForReserve" class="card mb-3" style="max-width: 100%;">
+
+						<!-- 아티스트 상세 보기 영역 -->
+
+					</div>
+				</div>
+				
+<!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+				
+			</div>
+		</div>
+	</div>
+
+<!-- ========================================================================================================================================================== -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<script th:src="@{//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js}"></script>
+	<script th:inline="javascript">
+	
+		// 회원가입시 주소
+		function searchAddr() {
+			new daum.Postcode({
+				oncomplete: function(data) {
+					// 도로명 주소
+					const rodeAddr = data.roadAddress;
+					$("input[name=userAddr]").val(rodeAddr);
+				}
+			}).open();
+		}
+
+		//bootstrap Modal 좀 더 편하게 다루기
+		let bootstrapModal;
+		function showModal(modalTag) {
+			bootstrapModal = new bootstrap.Modal(modalTag);
+			bootstrapModal.show();
+		}
+		function hideModal() {
+			bootstrapModal.hide();
+		}
+
+		const modalLogin = document.querySelector('#modalLogin');
+		const modalAlert = document.querySelector('#modalAlert');
+		
+		
+		
+		// login-page 클래스의 애니메이션 기능 활성화
+		$('.message a').click(function() {
+			$('form').animate({
+				height : "toggle",
+				opacity : "toggle"
+			}, "slow");
+		});
+		
+		// 가입 펑션
+		function join() {
+			
+			const registerForm = $("form[name=registerForm]");
+			
+			//비밀번호 체크
+			if(registerForm.find("input[name=userPw]").val() != registerForm.find("input[name=userPwChecker]").val()){
+				modalAlert.querySelector('.modalAlert_InnerContent').innerText = "비밀번호가 일치하지 않습니다!";
+				showModal(modalAlert);
+				
+				return;
+			}
+			
+			//ajax start
+			$.ajax({
+				url : '/join', //요청경로
+				type : 'post',
+				
+				data: registerForm.serialize(),
+				
+				success : function(result) {
+
+					//가입 실패할 경우 에러 메세지 띄우기..!
+					if (result.userId == null) {
+						
+						if(result.errors != null){
+							let str = '';
+							for(error of result.errors)
+								if(str == '')
+									str += error;
+								else
+									str += ('\n\n' + error);
+							
+							modalAlert.querySelector('.modalAlert_InnerContent').innerText = str;
+							showModal(modalAlert);
+						}
+						if(result.duplicated != null){
+							modalAlert.querySelector('.modalAlert_InnerContent').innerText = result.duplicated;
+							showModal(modalAlert);
+						}
+							
+						return;
+					}
+					
+					//가입 성공한 경우 자동으로 로그인 완료!
+					Swal.fire({
+						icon: 'success'
+						, title: `${result.userName} 님 가입이 완료되었습니다!`
+						, text: `자동으로 이전 페이지로 돌아갑니다!`
+						, timer: 1500
+						
+						, didOpen: () => {
+							timerInterval = setInterval(() => { /* DO NOTHING :) */ }, 100)
+						}
+						, willClose: () => {
+							clearInterval(timerInterval)
+						}
+						
+					}).then(() => {
+						
+						// 						if(result.userRole.indexOf('ADMIN') > -1){
+						// 							alert('관리자 로그인 입니다..!');
+						// 							location.href = '/admin/regItem';
+						// 							return;
+						// 						}
+						//						else
+						location.href = result.Referer;
+					});
+				},
+				error : function() {
+					alert('Ajax 실패');
+				}
+			});
+			//ajax end
+		}
+		
+		// 로그인 펑션
+		function login() {
+			//ajax start
+			$.ajax({
+				url : '/login', //요청경로
+				type : 'post',
+				
+				data: $("form[name=loginForm]").serialize(),
+				
+				success : function(result) {
+
+					//로그인 정보 없을 경우, 강제 탈출!
+					if (result.userId == null) {
+						
+						modalAlert.querySelector('.modalAlert_InnerContent').innerText = result.alertMsg;
+						showModal(modalAlert);
+						
+						return;
+					}
+
+					//로그인 완료!
+					Swal.fire({
+						icon: 'success'
+						, title: `반갑습니다! ${result.userName} 님`
+						, text: `자동으로 이전 페이지로 돌아갑니다!`
+						, timer: 1500
+						
+						, didOpen: () => {
+							timerInterval = setInterval(() => { /* DO NOTHING :) */ }, 100)
+						}
+						, willClose: () => {
+							clearInterval(timerInterval)
+						}
+						
+						}).then(() => {
+							
+							// 						if(result.userRole.indexOf('ADMIN') > -1){
+							// 							alert('관리자 로그인 입니다..!');
+							// 							location.href = '/admin/regItem';
+							// 							return;
+							// 						}
+							//						else
+							location.href = result.Referer;
+					});
+				},
+				error : function() {
+					alert('Ajax 실패');
+				}
+			});
+			//ajax end
+		}
+		// 비밀번호창에서 ENTER 하면 login 자동 실행됨
+		document.querySelector('.login-form').querySelector(
+				'input[type="password"]').addEventListener("keydown",
+				function() {
+					e = window.event;
+
+					// ENTER	https://www.toptal.com/developers/keycode
+					if (e.keyCode == '13')
+						login();
+				});
+
+		// 모달 닫을때는 내용 리셋 해줘
+		modalLogin.addEventListener('hidden.bs.modal', function() {
+			modalLogin.querySelector('.login-form').reset();
+			
+			//가입하던거 다 지우는건 에바지
+			//modalLogin.querySelector('.register-form').reset();
+		});
+
+		// 로그인 모달 켜라고하면 켜
+		let isOpenLogin = document.querySelector('#openLogin').value;
+		if (isOpenLogin.indexOf("true") > -1)
+			showModal(modalLogin);
+	</script>
+	
+	<link href="/css/common/top.css" rel="stylesheet">
+
+</th:block>
+</html>

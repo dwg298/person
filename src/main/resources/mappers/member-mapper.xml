@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 해당 파일에 모든 쿼리문을 작성 -->
+<mapper namespace="memberMapper">
+	
+	<!-- 유저 -->
+	<resultMap type="kh.study.consupport.common.vo.UsersVO" id="user">
+		<id column="USER_ID"		 		property="userId"/>
+		<result column="USER_PW" 			property="userPw"/>
+		<result column="USER_NAME" 			property="userName"/>
+		<result column="USER_ADDR" 			property="userAddr"/>
+		<result column="USER_ADDR_DETAIL" 	property="userAddrDetail"/>
+		<result column="USER_BIRTH" 		property="userBirth"/>
+		<result column="USER_TELL" 			property="userTell"/>
+		
+		<result column="USER_MILEAGE" 		property="userMileage"/>
+		<result column="USER_ROLE" 			property="userRole"/>
+		<result column="USER_STATUS" 		property="userStatus"/>
+	</resultMap>
+
+	<!-- 세일즈 -->
+	<resultMap type="kh.study.consupport.common.vo.SalesVO" id="sales">
+		<id column="SALES_CODE" 				property="salesCode"/>
+		<result column="SALES_AMOUNT" 			property="salesAmount"/>
+		<result column="SALES_TOTAL_PRICE"		property="salesTotalPrice"/>
+		<result column="SALES_DATE" 			property="salesDate"/>
+		<result column="SALES_STATUS" 			property="salesStatus"/>
+		<result column="USER_ID" 				property="userId"/>
+		<result column="HALL_CODE" 				property="hallCode"/>
+		
+		<result column="CONCERT_CODE" 			property="concertCode"/>
+		
+		<result column="IS_EXPIRED" 			property="isExpired"/>
+		
+		<association property="concert" 		resultMap="commonMapper.concert"/>
+		<association property="coupon" 			resultMap="coupon"/>
+		
+		<collection property="salesDetailList"	resultMap="salesDetail"/>
+	</resultMap>
+
+	<!-- 세일즈 디테일 -->
+	<resultMap type="kh.study.consupport.common.vo.SalesDetailVO" id="salesDetail">
+		<id column="SALES_DETAIL_CODE" 		property="salesDetailCode"/>
+		<result column="SALES_CODE" 		property="salesCode"/>
+		<result column="TICKET_CODE" 		property="ticketCode"/>
+		
+		<result column="SEAT_CODE" 			property="seatCode"/>
+		<result column="CONCERT_PRICE" 		property="concertPrice"/>
+	</resultMap>
+
+	<!-- 쿠폰 -->
+	<resultMap type="kh.study.consupport.common.vo.CouponVO" id="coupon">
+		<id column="COUPON_CODE" 			property="couponCode"/>
+		<result column="COUPON_VALUE" 		property="couponValue"/>
+		<result column="COUPON_STATUS" 		property="couponStatus"/>
+		
+		<result column="USER_ID" 			property="userId"/>
+		<result column="SALES_CODE" 		property="salesCode"/>
+	</resultMap>
+
+
+<!--========================================================================================================================================================================================-->
+
+	<!-- 아티스트 심사 등록
+	<insert id="insertArtist">
+		INSERT INTO ARTIST (
+			USER_ID
+			, ARTIST_NAME
+			, ARTIST_DETAIL
+		) VALUES (
+			#{userId}
+			, #{artistName}
+			, #{artistDetail}
+		)
+	</insert> -->
+	<insert id="insertArtist">
+		MERGE
+		    INTO ARTIST
+		USING DUAL
+		    ON (
+		    	USER_ID = #{userId}
+		    )
+		WHEN MATCHED THEN
+			UPDATE SET
+				ARTIST_NAME = #{artistName}
+				, ARTIST_DETAIL = #{artistDetail}
+		WHEN NOT MATCHED THEN
+		    INSERT (
+				USER_ID
+				, ARTIST_NAME
+				, ARTIST_DETAIL
+			) VALUES (
+				#{userId}
+				, #{artistName}
+				, #{artistDetail}
+		    )
+	</insert>
+	
+	
+	<!-- 아티스트 이미지 등록 시 트랜잭션 필요... -->
+	<delete id="deleteArtistOldImgs">
+		DELETE ARTIST_IMG
+		WHERE USER_ID = #{userId}
+	</delete>
+	
+	
+	
+	<!-- 아티스트 심사 이미지 등록 -->
+	<insert id="insertArtistImgs">
+		INSERT INTO ARTIST_IMG (
+			ARTIST_IMG_CODE
+			, ARTIST_IMG_NAME_ORIGIN
+			, ARTIST_IMG_NAME_ATTACHED
+			, ARTIST_IMG_IS_MAIN
+			, USER_ID
+		) 
+		<foreach collection="artistImgList" item="artistImg" separator="UNION ALL" index="i">
+		SELECT (SELECT 'A_IMG_'||LPAD(NVL(MAX(TO_NUMBER(SUBSTR(ARTIST_IMG_CODE, 7))), 0) + 1 + #{i}, 6, 0) 
+	         	FROM ARTIST_IMG)
+			, #{artistImg.artistImgNameOrigin}
+			, #{artistImg.artistImgNameAttached}
+			, #{artistImg.artistImgIsMain}
+			, #{userId}
+		FROM DUAL
+		</foreach>
+	</insert>
+	
+	
+<!--========================================================================================================================================================================================-->
+
+	<!-- 비밀번호 인증(내 정보 수정 창 이동) -->
+	<select id="selectPw" resultType="String">
+		SELECT USER_PW
+		FROM USERS
+		WHERE 
+		USER_ID = #{userId}
+	</select>
+
+<!--========================================================================================================================================================================================-->
+
+	<!-- 내정보 수정 창 이동 -->
+	<select id="editInfoForm" resultMap="user">
+		SELECT USER_ID
+		    , USER_NAME
+		    , USER_ADDR
+		    , USER_ADDR_DETAIL
+		    , USER_BIRTH
+		    , USER_TELL
+		    , USER_MILEAGE
+		FROM USERS
+		WHERE USER_ID = #{userId}
+	</select>
+	
+	<!-- 내 정보 수정 -->
+	<update id="updateEditInfo">
+		UPDATE USERS
+			SET
+			USER_NAME = #{userName}
+			, USER_ADDR = #{userAddr}
+			, USER_ADDR_DETAIL = #{userAddrDetail}
+			, USER_TELL = #{userTell}
+		WHERE USER_ID = #{userId}
+	</update>
+
+<!--========================================================================================================================================================================================-->
+	
+	<select id="enterEditInfoForm" resultMap="user">
+		SELECT USER_ID
+		FROM USERS
+		WHERE USER_PW = #{userPw} 
+	</select>
+
+<!--========================================================================================================================================================================================-->
+
+	<!-- 마이페이지 구매 정보 조회 -->
+	<select id="selectMypageSalesInfo" resultMap="sales">
+		SELECT SEAT_CODE
+			, CONCERT_NAME
+			
+			, CASE
+				WHEN SEAT_CODE LIKE 'R_%' THEN
+					(SELECT CONCERT_PRICE_R 
+					 FROM CONCERT_PRICE 
+					 WHERE CONCERT_CODE = SALES.CONCERT_CODE)
+				WHEN SEAT_CODE LIKE 'S_%' THEN
+					(SELECT CONCERT_PRICE_S 
+					 FROM CONCERT_PRICE 
+					 WHERE CONCERT_CODE = SALES.CONCERT_CODE)
+				ELSE
+					(SELECT CONCERT_PRICE_A 
+					 FROM CONCERT_PRICE 
+					 WHERE CONCERT_CODE = SALES.CONCERT_CODE)
+				
+				END AS CONCERT_PRICE
+				
+			, SALES_DETAIL_CODE
+			, SALES.SALES_CODE
+	
+			, COUPON_CODE
+			, COUPON_VALUE
+			
+			, SALES.CONCERT_CODE
+			, SALES.HALL_CODE
+			, HALL_RENT_DATE AS CONCERT_DATE
+			
+			, CASE
+				WHEN HALL_RENT_DATE >= (SELECT SYSDATE FROM DUAL) THEN
+	                TO_CHAR('공연까지 ' || TRUNC(HALL_RENT_DATE - (SELECT SYSDATE FROM DUAL)) || '일 남았습니다.')
+	            ELSE
+	                '만료된 공연입니다.'
+	            END AS IS_EXPIRED
+			 
+			, CONI.CONCERT_IMG_NAME_ATTACHED
+	        , CONCERT_IMG_IS_MAIN
+			
+			, SALES.SALES_CODE
+			, SALES_TOTAL_PRICE
+			, SALES_AMOUNT
+			, SALES_DATE
+			, SALES.USER_ID
+
+		FROM SALES, SALES_DETAIL, COUPON CP, CONCERT, CONCERT_PRICE, HALL_DATE, TICKET, CONCERT_IMG CONI
+		WHERE SALES.SALES_CODE = SALES_DETAIL.SALES_CODE
+		AND SALES.SALES_CODE = CP.SALES_CODE(+)
+		AND SALES.CONCERT_CODE = CONCERT_PRICE.CONCERT_CODE
+		AND SALES.CONCERT_CODE = CONCERT.CONCERT_CODE
+		AND CONCERT.HALL_DATE_CODE = HALL_DATE.HALL_DATE_CODE
+		AND SALES_DETAIL.TICKET_CODE = TICKET.TICKET_CODE
+		AND CONI.CONCERT_CODE = CONCERT.CONCERT_CODE
+		
+		AND SALES_STATUS = 'PAID'
+		AND SALES.USER_ID = #{userId}
+		AND CONCERT_IMG_IS_MAIN = 'Y'
+		ORDER BY SALES.SALES_CODE DESC
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</mapper>
